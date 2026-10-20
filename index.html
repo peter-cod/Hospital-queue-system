@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hospital Queue Management System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px #00000015;
+    }
+    h1, h2 { color: #14532d; text-align: center; }
+    p { text-align: center; color: #555; }
+    input, button {
+      width: 100%; padding: 12px; margin: 8px 0;
+      box-sizing: border-box; font-size: 16px; border-radius: 6px;
+    }
+    input { border: 1px solid #ccc; }
+    button {
+      border: none; background: #15803d; color: white; cursor: pointer;
+    }
+    button:hover { background: #166534; }
+    .next { background: #2563eb; }
+    .next:hover { background: #1d4ed8; }
+    .clear { background: #dc2626; }
+    li {
+      background: #f0fdf4; padding: 12px; margin: 8px 0; border-radius: 6px;
+    }
+    .current {
+      background: #dbeafe; padding: 15px; border-radius: 8px; text-align: center;
+    }
+    #message { color: #b91c1c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hospital Queue System</h1>
+    <p>Manage patients waiting for attention.</p>
+
+    <input type="text" id="patientName" placeholder="Enter patient's name">
+    <button onclick="addPatient()">Add Patient</button>
+
+    <div class="current">
+      <h2>Now Serving</h2>
+      <p id="serving">No patient called yet.</p>
+    </div>
+
+    <button class="next" onclick="callNext()">Call Next Patient</button>
+
+    <h2>Waiting Patients</h2>
+    <ol id="queueList"></ol>
+    <p id="count">Patients waiting: 0</p>
+    <p id="served">Patients served: 0</p>
+    <p id="message" role="status"></p>
+
+    <button class="clear" onclick="clearQueue()">Clear Queue</button>
+  </div>
+
+  <script>
+    // An array is used to implement the queue (FIFO).
+    let patientQueue = [];
+    let servedCount = 0;
+
+    // Add a patient to the end of the queue.
+    function addPatient() {
+      const input = document.getElementById("patientName");
+      const name = input.value.trim();
+
+      if (name === "") {
+        document.getElementById("message").textContent =
+          "Please enter a patient's name.";
+        return;
+      }
+
+      patientQueue.push(name);
+      input.value = "";
+      document.getElementById("message").textContent = "";
+      displayQueue();
+    }
+
+    // Remove and serve the first patient in the queue.
+    function callNext() {
+      if (patientQueue.length === 0) {
+        document.getElementById("message").textContent =
+          "There are no patients waiting.";
+        return;
+      }
+
+      const nextPatient = patientQueue.shift();
+      document.getElementById("serving").textContent = nextPatient;
+      servedCount++;
+      document.getElementById("message").textContent = "";
+      displayQueue();
+    }
+
+    // Display all patients who are still waiting.
+    function displayQueue() {
+      const list = document.getElementById("queueList");
+      list.innerHTML = "";
+
+      patientQueue.forEach(function(patient) {
+        const item = document.createElement("li");
+        item.textContent = patient;
+        list.appendChild(item);
+      });
+
+      document.getElementById("count").textContent =
+        "Patients waiting: " + patientQueue.length;
+      document.getElementById("served").textContent =
+        "Patients served: " + servedCount;
+    }
+
+    // Clear the waiting list and reset the current display.
+    function clearQueue() {
+      patientQueue = [];
+      document.getElementById("serving").textContent =
+        "No patient called yet.";
+      document.getElementById("message").textContent = "";
+      displayQueue();
+    }
+
+    // Allow Enter to add a patient.
+    document.getElementById("patientName").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") addPatient();
+    });
+  </script>
+</body>
+</html>
